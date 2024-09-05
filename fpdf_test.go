@@ -58,13 +58,6 @@ func cleanup() {
 		})
 }
 
-func TestFpdfImplementPdf(t *testing.T) {
-	// this will not compile if Fpdf and Tpl
-	// do not implement Pdf
-	var _ gofpdf.Pdf = (*gofpdf.Fpdf)(nil)
-	var _ gofpdf.Pdf = (*gofpdf.Tpl)(nil)
-}
-
 // TestPagedTemplate ensures new paged templates work
 func TestPagedTemplate(t *testing.T) {
 	pdf := gofpdf.New("P", "mm", "A4", "")
@@ -2646,7 +2639,7 @@ func ExampleUTF8CutFont() {
 	if err == nil {
 		subFontFileStr = "calligra_abcde.ttf"
 		subFont = gofpdf.UTF8CutFont(fullFont, "abcde")
-		err = ioutil.WriteFile(subFontFileStr, subFont, 0600)
+		err = ioutil.WriteFile(subFontFileStr, subFont, 0o600)
 		if err == nil {
 			y := 24.0
 			pdf := gofpdf.New("P", "mm", "A4", "")

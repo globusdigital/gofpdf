@@ -268,8 +268,8 @@ func (t *FpdfTpl) GobDecode(buf []byte) error {
 	return err
 }
 
-// Tpl is an Fpdf used for writing a template. It has most of the facilities of
-// an Fpdf, but cannot add more pages. Tpl is used directly only during the
+// Tpl is a Fpdf used for writing a template. It has most of the facilities of
+// a Fpdf, but cannot add more pages. Tpl is used directly only during the
 // limited time a template is writable.
 type Tpl struct {
 	Fpdf

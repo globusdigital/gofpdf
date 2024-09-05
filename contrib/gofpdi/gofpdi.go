@@ -1,16 +1,19 @@
-/*
-Package gofpdi wraps the gofpdi PDF library to import existing PDFs as templates. See github.com/phpdave11/gofpdi
-for further information and examples.
+// Package gofpdi wraps the gofpdi PDF library to import existing PDFs as
+// templates. See github.com/globusdigital/gofpdi for further information and
+// examples.
+//
+// Users should call NewImporter() to obtain their own Importer instance to work
+// with. To retain backwards compatibility, the package offers a default Importer
+// that may be used via global functions. Note however that use of the default
+// Importer is not thread safe.
 
-Users should call NewImporter() to obtain their own Importer instance to work with.
-To retain backwards compatibility, the package offers a default Importer that may be used via global functions. Note
-however that use of the default Importer is not thread safe.
-*/
 package gofpdi
 
 import (
-	realgofpdi "github.com/phpdave11/gofpdi"
 	"io"
+
+	realgofpdi "github.com/globusdigital/gofpdi"
+	"github.com/pkg/errors"
 )
 
 // gofpdiPdf is a partial interface that only implements the functions we need
@@ -38,7 +41,7 @@ func NewImporter() *Importer {
 // ImportPage imports a page of a PDF file with the specified box (/MediaBox,
 // /TrimBox, /ArtBox, /CropBox, or /BleedBox). Returns a template id that can
 // be used with UseImportedTemplate to draw the template onto the page.
-func (i *Importer) ImportPage(f gofpdiPdf, sourceFile string, pageno int, box string) int {
+func (i *Importer) ImportPage(f gofpdiPdf, sourceFile string, pageno int, box string) (int, error) {
 	// Set source file for fpdi
 	i.fpdi.SetSourceFile(sourceFile)
 	// return template id
@@ -49,21 +52,29 @@ func (i *Importer) ImportPage(f gofpdiPdf, sourceFile string, pageno int, box st
 // (/MediaBox, TrimBox, /ArtBox, /CropBox, or /BleedBox). Returns a template id
 // that can be used with UseImportedTemplate to draw the template onto the
 // page.
-func (i *Importer) ImportPageFromStream(f gofpdiPdf, rs *io.ReadSeeker, pageno int, box string) int {
+func (i *Importer) ImportPageFromStream(f gofpdiPdf, rs io.ReadSeeker, pageno int, box string) (int, error) {
 	// Set source stream for fpdi
-	i.fpdi.SetSourceStream(rs)
+	if err := i.fpdi.SetSourceStream(rs); err != nil {
+		return 0, err
+	}
 	// return template id
 	return i.getTemplateID(f, pageno, box)
 }
 
-func (i *Importer) getTemplateID(f gofpdiPdf, pageno int, box string) int {
+func (i *Importer) getTemplateID(f gofpdiPdf, pageno int, box string) (int, error) {
 	// Import page
-	tpl := i.fpdi.ImportPage(pageno, box)
+	tpl, err := i.fpdi.ImportPage(pageno, box)
+	if err != nil {
+		return 0, errors.WithStack(err)
+	}
 
 	// Import objects into current pdf document
 	// Unordered means that the objects will be returned with a sha1 hash instead of an integer
 	// The objects themselves may have references to other hashes which will be replaced in ImportObjects()
-	tplObjIDs := i.fpdi.PutFormXobjectsUnordered()
+	tplObjIDs, err := i.fpdi.PutFormXobjectsUnordered()
+	if err != nil {
+		return 0, errors.WithStack(err)
+	}
 
 	// Set template names and ids (hashes) in gofpdf
 	f.ImportTemplates(tplObjIDs)
@@ -82,7 +93,7 @@ func (i *Importer) getTemplateID(f gofpdiPdf, pageno int, box string) int {
 	// Import gofpdi object hashes and their positions into gopdf
 	f.ImportObjPos(importedObjPos)
 
-	return tpl
+	return tpl, nil
 }
 
 // UseImportedTemplate draws the template onto the page at x,y. If w is 0, the
@@ -100,44 +111,6 @@ func (i *Importer) UseImportedTemplate(f gofpdiPdf, tplid int, x float64, y floa
 // <page number>: page number, note that page numbers start at 1
 // <box>: box identifier, e.g. "/MediaBox"
 // <dimension>: dimension string, either "w" or "h"
-func (i *Importer) GetPageSizes() map[int]map[string]map[string]float64 {
+func (i *Importer) GetPageSizes() (map[int]map[string]map[string]float64, error) {
 	return i.fpdi.GetPageSizes()
-}
-
-// Default Importer used by global functions
-var fpdi = NewImporter()
-
-// ImportPage imports a page of a PDF file with the specified box (/MediaBox,
-// /TrimBox, /ArtBox, /CropBox, or /BleedBox). Returns a template id that can
-// be used with UseImportedTemplate to draw the template onto the page.
-// Note: This uses the default Importer. Call NewImporter() to obtain a custom Importer.
-func ImportPage(f gofpdiPdf, sourceFile string, pageno int, box string) int {
-	return fpdi.ImportPage(f, sourceFile, pageno, box)
-}
-
-// ImportPageFromStream imports a page of a PDF with the specified box
-// (/MediaBox, TrimBox, /ArtBox, /CropBox, or /BleedBox). Returns a template id
-// that can be used with UseImportedTemplate to draw the template onto the
-// page.
-// Note: This uses the default Importer. Call NewImporter() to obtain a custom Importer.
-func ImportPageFromStream(f gofpdiPdf, rs *io.ReadSeeker, pageno int, box string) int {
-	return fpdi.ImportPageFromStream(f, rs, pageno, box)
-}
-
-// UseImportedTemplate draws the template onto the page at x,y. If w is 0, the
-// template will be scaled to fit based on h. If h is 0, the template will be
-// scaled to fit based on w.
-// Note: This uses the default Importer. Call NewImporter() to obtain a custom Importer.
-func UseImportedTemplate(f gofpdiPdf, tplid int, x float64, y float64, w float64, h float64) {
-	fpdi.UseImportedTemplate(f, tplid, x, y, w, h)
-}
-
-// GetPageSizes returns page dimensions for all pages of the imported pdf.
-// Result consists of map[<page number>]map[<box>]map[<dimension>]<value>.
-// <page number>: page number, note that page numbers start at 1
-// <box>: box identifier, e.g. "/MediaBox"
-// <dimension>: dimension string, either "w" or "h"
-// Note: This uses the default Importer. Call NewImporter() to obtain a custom Importer.
-func GetPageSizes() map[int]map[string]map[string]float64 {
-	return fpdi.GetPageSizes()
 }

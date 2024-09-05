@@ -25,11 +25,13 @@ import (
 )
 
 // flags
-const symbolWords = 1 << 0
-const symbolScale = 1 << 3
-const symbolContinue = 1 << 5
-const symbolAllScale = 1 << 6
-const symbol2x2 = 1 << 7
+const (
+	symbolWords    = 1 << 0
+	symbolScale    = 1 << 3
+	symbolContinue = 1 << 5
+	symbolAllScale = 1 << 6
+	symbol2x2      = 1 << 7
+)
 
 // CID map Init
 const toUnicode = "/CIDInit /ProcSet findresource begin\n12 dict begin\nbegincmap\n/CIDSystemInfo\n<</Registry (Adobe)\n/Ordering (UCS)\n/Supplement 0\n>> def\n/CMapName /Adobe-Identity-UCS def\n/CMapType 2 def\n1 begincodespacerange\n<0000> <FFFF>\nendcodespacerange\n1 beginbfrange\n<0000> <FFFF> <0000>\nendbfrange\nendcmap\nCMapName currentdict /CMap defineresource pop\nend\nend"
@@ -117,7 +119,6 @@ func (utf *utf8FontFile) parseFile() error {
 }
 
 func (utf *utf8FontFile) generateTableDescriptions() {
-
 	tablesCount := utf.readUint16()
 	_ = utf.readUint16()
 	_ = utf.readUint16()
@@ -189,7 +190,7 @@ func (utf *utf8FontFile) skip(delta int) {
 	_, _ = utf.fileReader.seek(int64(delta), 1)
 }
 
-//SeekTable position
+// SeekTable position
 func (utf *utf8FontFile) SeekTable(name string) int {
 	return utf.seekTable(name, 0)
 }
@@ -619,7 +620,6 @@ func (utf *utf8FontFile) generateCMAPTable(cidSymbolPairCollection map[int]int, 
 	cmap = append(cmap, 1)
 	for range cidArray {
 		cmap = append(cmap, 0)
-
 	}
 	cmap = append(cmap, 0)
 	for _, start := range cidArrayKeys {
@@ -635,7 +635,7 @@ func (utf *utf8FontFile) generateCMAPTable(cidSymbolPairCollection map[int]int, 
 	return cmapstr
 }
 
-//GenerateCutFont fill utf8FontFile from .utf file, only with runes from usedRunes
+// GenerateCutFont fill utf8FontFile from .utf file, only with runes from usedRunes
 func (utf *utf8FontFile) GenerateCutFont(usedRunes map[int]int) []byte {
 	utf.fileReader.readerPosition = 0
 	utf.symbolPosition = make([]int, 0)

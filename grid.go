@@ -5,7 +5,7 @@ import (
 	"strconv"
 )
 
-func unused(args ...interface{}) {
+func unused(args ...any) {
 }
 
 // RGBType holds fields for red, green and blue color components (0..255)
@@ -418,7 +418,6 @@ func (g GridType) Grid(pdf *Fpdf) {
 		st.Put(pdf)
 
 	}
-
 }
 
 // Plot plots a series of count line segments from xMin to xMax. It repeatedly

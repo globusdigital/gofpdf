@@ -3,11 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/phpdave11/gofpdf"
 	"os"
+
+	"github.com/globusdigital/gofpdf"
 )
 
-func errPrintf(fmtStr string, args ...interface{}) {
+func errPrintf(fmtStr string, args ...any) {
 	fmt.Fprintf(os.Stderr, fmtStr, args...)
 }
 

@@ -66,7 +66,7 @@ func TestGofpdiConcurrent(t *testing.T) {
 			pdf.AddPage()
 			rs, _ := getTemplatePdf()
 			imp := NewImporter()
-			tpl,err := imp.ImportPageFromStream(pdf, rs, 1, "/MediaBox")
+			tpl, err := imp.ImportPageFromStream(pdf, rs, 1, "/MediaBox")
 			if err != nil {
 				fmt.Println(err)
 				return

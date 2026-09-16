@@ -87,7 +87,7 @@ func (f *Fpdf) putAttachments() {
 }
 
 // return /EmbeddedFiles tree name catalog entry.
-func (f Fpdf) getEmbeddedFiles() string {
+func (f *Fpdf) getEmbeddedFiles() string {
 	names := make([]string, len(f.attachments))
 	for i, as := range f.attachments {
 		names[i] = fmt.Sprintf("(Attachement%d) %d 0 R ", i+1, as.objectNumber)

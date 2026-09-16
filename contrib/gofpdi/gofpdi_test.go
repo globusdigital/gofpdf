@@ -58,10 +58,8 @@ func ExampleNewImporter() {
 
 func TestGofpdiConcurrent(t *testing.T) {
 	wg := sync.WaitGroup{}
-	for i := 0; i < 100; i++ {
-		wg.Add(1)
-		go func() {
-			defer wg.Done()
+	for range 100 {
+		wg.Go(func() {
 			pdf := gofpdf.New("P", "mm", "A4", "")
 			pdf.AddPage()
 			rs, _ := getTemplatePdf()
@@ -77,7 +75,7 @@ func TestGofpdiConcurrent(t *testing.T) {
 			if err := pdf.Output(&buf); err != nil {
 				t.Fail()
 			}
-		}()
+		})
 	}
 	wg.Wait()
 }

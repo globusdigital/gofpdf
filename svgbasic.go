@@ -116,7 +116,7 @@ func pathParse(pathStr string) (segs []SVGBasicSegmentType, err error) {
 	setup := func(n int) {
 		// It is not strictly necessary to clear arguments, but result may be clearer
 		// to caller
-		for j := 0; j < len(seg.Arg); j++ {
+		for j := range len(seg.Arg) {
 			seg.Arg[j] = 0.0
 		}
 		argJ = 0

@@ -173,12 +173,12 @@ func (f *Fpdf) parsepngstream(buf *bytes.Buffer, readdpi bool) (info *ImageInfoT
 			height := int(h)
 			length := 2 * width
 			var pos, elPos int
-			for i := 0; i < height; i++ {
+			for i := range height {
 				pos = (1 + length) * i
 				color.WriteByte(data[pos])
 				alpha.WriteByte(data[pos])
 				elPos = pos + 1
-				for k := 0; k < width; k++ {
+				for range width {
 					color.WriteByte(data[elPos])
 					alpha.WriteByte(data[elPos+1])
 					elPos += 2
@@ -190,12 +190,12 @@ func (f *Fpdf) parsepngstream(buf *bytes.Buffer, readdpi bool) (info *ImageInfoT
 			height := int(h)
 			length := 4 * width
 			var pos, elPos int
-			for i := 0; i < height; i++ {
+			for i := range height {
 				pos = (1 + length) * i
 				color.WriteByte(data[pos])
 				alpha.WriteByte(data[pos])
 				elPos = pos + 1
-				for k := 0; k < width; k++ {
+				for range width {
 					color.Write(data[elPos : elPos+3])
 					alpha.WriteByte(data[elPos+3])
 					elPos += 4

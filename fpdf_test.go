@@ -74,7 +74,7 @@ func TestPagedTemplate(t *testing.T) {
 	}
 
 	tplPages := tpl.FromPages()
-	for x := 0; x < len(tplPages); x++ {
+	for x := range tplPages {
 		pdf.AddPage()
 		pdf.UseTemplate(tplPages[x])
 	}
@@ -543,7 +543,7 @@ func ExampleFpdf_SplitLines_tables() {
 	// Headers
 	pdf.SetTextColor(224, 224, 224)
 	pdf.SetFillColor(64, 64, 64)
-	for colJ := 0; colJ < colCount; colJ++ {
+	for colJ := range colCount {
 		pdf.CellFormat(colWd, 10, header[colJ], "1", 0, "CM", true, 0, "")
 	}
 	pdf.Ln(-1)
@@ -553,10 +553,10 @@ func ExampleFpdf_SplitLines_tables() {
 	// Rows
 	y := pdf.GetY()
 	count := 0
-	for rowJ := 0; rowJ < 2; rowJ++ {
+	for range 2 {
 		maxHt := lineHt
 		// Cell height calculation loop
-		for colJ := 0; colJ < colCount; colJ++ {
+		for colJ := range colCount {
 			count++
 			if count > len(strList) {
 				count = 1
@@ -571,7 +571,7 @@ func ExampleFpdf_SplitLines_tables() {
 		}
 		// Cell render loop
 		x := marginH
-		for colJ := 0; colJ < colCount; colJ++ {
+		for colJ := range colCount {
 			pdf.Rect(x, y, colWd, maxHt+cellGap+cellGap, "D")
 			cell = cellList[colJ]
 			cellY := y + cellGap + (maxHt-cell.ht)/2
@@ -922,7 +922,7 @@ func ExampleFpdf_SetAcceptPageBreakFunc() {
 	})
 	pdf.AddPage()
 	pdf.SetFont("Times", "", 12)
-	for j := 0; j < 20; j++ {
+	for j := range 20 {
 		if j == 1 {
 			pdf.Image(example.ImageFile("fpdf.png"), -1, 0, colWd, 0, true, "", 0, "")
 		} else if j == 5 {
@@ -1072,9 +1072,9 @@ func ExampleFpdf_SetAlpha() {
 	pdf.CellFormat(pageW, gapY, "Alpha Blending Modes", "", 0, "C", false, 0, "")
 	j := 0
 	y := 3 * gapY
-	for col := 0; col < 4; col++ {
+	for range 4 {
 		x := gapX
-		for row := 0; row < 4; row++ {
+		for range 4 {
 			pdf.Rect(x, y, rectW, rectH, "D")
 			pdf.SetFont("Helvetica", "B", 12)
 			pdf.SetFillColor(0, 0, 0)
@@ -1554,7 +1554,7 @@ func ExampleFpdf_CellFormat_align() {
 	}
 	formatRect := func(pdf *gofpdf.Fpdf, recList []recType) {
 		linkStr := ""
-		for pageJ := 0; pageJ < 2; pageJ++ {
+		for range 2 {
 			pdf.AddPage()
 			pdf.SetMargins(10, 10, 10)
 			pdf.SetAutoPageBreak(false, 0)
@@ -1686,7 +1686,7 @@ func ExampleFpdf_Polygon() {
 		var pt gofpdf.PointType
 		res = make([]gofpdf.PointType, 0, count)
 		mlt := 2.0 * math.Pi / float64(count)
-		for j := 0; j < count; j++ {
+		for j := range count {
 			pt.Y, pt.X = math.Sincos(float64(j) * mlt)
 			res = append(res, gofpdf.PointType{
 				X: x + radius*pt.X,
@@ -1706,11 +1706,11 @@ func ExampleFpdf_Polygon() {
 	advance = gap + 2.0*radius
 	y = 2*gap + pdf.PointConvert(ptSize) + radius
 	rgVal = 230
-	for row := 0; row < rowCount; row++ {
+	for row := range rowCount {
 		pdf.SetFillColor(rgVal, rgVal, 0)
 		rgVal -= 12
 		x = gap + radius
-		for col := 0; col < colCount; col++ {
+		for col := range colCount {
 			pts = vertices(row*colCount + col + 3)
 			pdf.Polygon(pts, "FD")
 			x += advance
@@ -2574,7 +2574,7 @@ func ExampleFpdf_TransformRotate() {
 
 	pdf.AddPage()
 	pdf.SetFont("Arial", "", 8)
-	for j := 0; j < 25; j++ {
+	for range 25 {
 		pdf.MultiCell(0, lineHt, loremStr, "", "L", false)
 	}
 
@@ -2705,9 +2705,9 @@ func ExampleFpdf_RoundedRect() {
 	r := 40
 	g := 30
 	b := 20
-	for row := 0; row < 4; row++ {
+	for row := range 4 {
 		x := hgap
-		for col := 0; col < 4; col++ {
+		for col := range 4 {
 			pdf.SetFillColor(r, g, b)
 			pdf.RoundedRect(x, y, wd, ht, radius, corner(row&1 == 1, row&2 == 2, col&1 == 1, col&2 == 2), "FD")
 			r += 8
@@ -2790,7 +2790,7 @@ func ExampleFpdf_SetTextRenderingMode() {
 		pdf.CellFormat(210, lineSz, fmt.Sprintf("Mode %d", mode), "", 1, "", false, 0, "")
 	}
 
-	for mode := 0; mode < 4; mode++ {
+	for mode := range 4 {
 		write(mode)
 	}
 	write(0)

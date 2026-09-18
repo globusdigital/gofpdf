@@ -25,6 +25,14 @@ func (f *Fpdf) SplitText(txt string, w float64) (lines []string) {
 	l := 0
 	for i < nb {
 		c := s[i]
+		if int(c) > len(cw) {
+			// skip if there are e.g. emojis, etc. and just print them directly
+			// in the next iteration. this will exceed the box size. at least we
+			// don't panic.
+			i++
+			continue
+		}
+
 		l += cw[c]
 		if unicode.IsSpace(c) || isChinese(c) {
 			sep = i
